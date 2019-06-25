@@ -35,8 +35,12 @@ var WIZARDS_PROPERTIES = {
   EYES_COLORS: ['black', 'red', 'blue', 'yellow', 'green']
 };
 
-var userDialog = document.querySelector('.setup');
-var similarListElement = userDialog.querySelector('.setup-similar-list');
+var userDialogElement = document.querySelector('.setup');
+var similarListElement = userDialogElement.querySelector('.setup-similar-list');
+var setupCloseElement = userDialogElement.querySelector('.setup-close');
+var setupUserNameElement = userDialogElement.querySelector('.setup-user-name');
+var setupOpenElement = document.querySelector('.setup-open');
+var setupOpenIconElement = setupOpenElement.querySelector('.setup-open-icon');
 var similarWizardTemplate = document
   .querySelector('#similar-wizard-template')
   .content.querySelector('.setup-similar-item');
@@ -82,8 +86,8 @@ var createWizard = function (wizard) {
   return wizardElement;
 };
 
-userDialog.classList.remove('hidden');
-userDialog.querySelector('.setup-similar').classList.remove('hidden');
+// userDialogElement.classList.remove('hidden');
+userDialogElement.querySelector('.setup-similar').classList.remove('hidden');
 
 var wizards = generateWizards(WIZARDS_PROPERTIES);
 
@@ -92,3 +96,59 @@ for (var i = 0; i < 4; i++) {
   fragment.appendChild(createWizard(wizards[i]));
 }
 similarListElement.appendChild(fragment);
+
+// Открытие/закрытие окна настройки персонажа:
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
+// Обработчик закрытия окна при нажатии Esc
+var onDialogEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseDialog();
+  }
+};
+
+// Обработчик открытия окна
+var onOpenDialog = function () {
+  userDialogElement.classList.remove('hidden');
+
+  // ****Удаляем обработчик открытия окна при открытом окне
+  setupOpenElement.removeEventListener('click', onOpenDialog);
+
+  // Закрытие окна при клике на Х или нажатии на нем Enter
+  setupCloseElement.addEventListener('click', onCloseDialog);
+  setupCloseElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      onCloseDialog();
+    }
+  });
+
+  // +++++ Закрытие окна при нажатии Esc
+  document.addEventListener('keydown', onDialogEscPress);
+  // Если фокус находится на форме ввода имени, то окно закрываться не должно
+  setupUserNameElement.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onDialogEscPress);
+  });
+  setupUserNameElement.addEventListener('blur', function () {
+    document.addEventListener('keydown', onDialogEscPress);
+  });
+};
+
+// Обработчик закрытия окна
+var onCloseDialog = function () {
+  userDialogElement.classList.add('hidden');
+
+  // Возвращаем обработчик открытия окна (смотри строку ****)
+  setupOpenElement.addEventListener('click', onOpenDialog);
+
+  // Удалям событие закрытия окна при нажатии Esc (смотри строку ++++)
+  document.removeEventListener('keydown', onDialogEscPress);
+};
+
+setupOpenElement.addEventListener('click', onOpenDialog);
+
+setupOpenIconElement.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    onOpenDialog();
+  }
+});
