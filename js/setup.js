@@ -32,7 +32,20 @@ var WIZARDS_PROPERTIES = {
     'rgb(0, 0, 0)'
   ],
 
-  EYES_COLORS: ['black', 'red', 'blue', 'yellow', 'green']
+  EYES_COLORS: ['black', 'red', 'blue', 'yellow', 'green'],
+
+  FIREBALL_COLORS: [
+    // 'rgb(238, 72, 48)',
+    '#ee4830',
+    // 'rgb(48, 168, 238)',
+    '#30a8ee',
+    // 'rgb(92, 230, 192)',
+    '#5ce6c0',
+    // 'rgb(232, 72, 213)',
+    '#e848d5',
+    // 'rgb(230, 232, 72)'
+    '#e6e848'
+  ]
 };
 
 var userDialogElement = document.querySelector('.setup');
@@ -86,7 +99,6 @@ var createWizard = function (wizard) {
   return wizardElement;
 };
 
-// userDialogElement.classList.remove('hidden');
 userDialogElement.querySelector('.setup-similar').classList.remove('hidden');
 
 var wizards = generateWizards(WIZARDS_PROPERTIES);
@@ -151,4 +163,67 @@ setupOpenIconElement.addEventListener('keydown', function (evt) {
   if (evt.keyCode === ENTER_KEYCODE) {
     onOpenDialog();
   }
+});
+
+var setupPlayerElement = userDialogElement.querySelector('.setup-player');
+var setupWizardCoatElement = setupPlayerElement.querySelector(
+    '.setup-wizard .wizard-coat'
+);
+var setupWizardEyesElement = setupPlayerElement.querySelector(
+    '.setup-wizard .wizard-eyes'
+);
+var setupFireballWrapElement = setupPlayerElement.querySelector(
+    '.setup-fireball-wrap'
+);
+
+// Обработчик - Меняет цвет элемента мага при нажатии на него
+var onWizardPropertyClick = function (
+    properties,
+    userPropertyElement,
+    cssProperty,
+    inputName
+) {
+  // Генерируем случайный цвет, если цвет повторяется берем другой случайный
+  do {
+    var userProperty =
+      properties[generateRandomInteger(0, properties.length - 1)];
+  } while (userProperty === userPropertyElement.style[cssProperty]);
+
+  // Меняем цвет
+  userPropertyElement.style[cssProperty] = userProperty;
+
+  // Записываем цвет в input
+  setupPlayerElement.querySelector(
+      'input[name = ' + inputName + ']'
+  ).value = userProperty;
+};
+
+// При клике меняем цвет мантии
+setupWizardCoatElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WIZARDS_PROPERTIES.COATS_COLORS,
+      this,
+      'fill',
+      'coat-color'
+  );
+});
+
+// При клике меняем цвет глаз
+setupWizardEyesElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WIZARDS_PROPERTIES.EYES_COLORS,
+      this,
+      'fill',
+      'eyes-color'
+  );
+});
+
+// При клике меняем цвет файербола
+setupFireballWrapElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WIZARDS_PROPERTIES.FIREBALL_COLORS,
+      this,
+      'background',
+      'fireball-color'
+  );
 });
