@@ -202,7 +202,7 @@ var onWizardPropertyClick = function (
 setupWizardCoatElement.addEventListener('click', function () {
   onWizardPropertyClick(
       WIZARDS_PROPERTIES.COATS_COLORS,
-      this,
+      setupWizardCoatElement,
       'fill',
       'coat-color'
   );
@@ -212,7 +212,7 @@ setupWizardCoatElement.addEventListener('click', function () {
 setupWizardEyesElement.addEventListener('click', function () {
   onWizardPropertyClick(
       WIZARDS_PROPERTIES.EYES_COLORS,
-      this,
+      setupWizardEyesElement,
       'fill',
       'eyes-color'
   );
@@ -222,7 +222,7 @@ setupWizardEyesElement.addEventListener('click', function () {
 setupFireballWrapElement.addEventListener('click', function () {
   onWizardPropertyClick(
       WIZARDS_PROPERTIES.FIREBALL_COLORS,
-      this,
+      setupFireballWrapElement,
       'background',
       'fireball-color'
   );
