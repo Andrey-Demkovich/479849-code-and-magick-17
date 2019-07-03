@@ -105,7 +105,7 @@ var createWizard = function (wizard) {
 
 userDialogElement.querySelector('.setup-similar').classList.remove('hidden');
 
-var wizardsCreateFragmentAppend = (function () {
+var wizardsCreateFragmentAppend = function () {
   var wizards = generateWizards(WizardProperty);
 
   var fragment = document.createDocumentFragment();
@@ -113,7 +113,9 @@ var wizardsCreateFragmentAppend = (function () {
     fragment.appendChild(createWizard(wizards[i]));
   }
   similarListElement.appendChild(fragment);
-})();
+};
+
+wizardsCreateFragmentAppend();
 
 // Открытие/закрытие окна настройки персонажа:
 // Обработчик закрытия окна при нажатии Esc
