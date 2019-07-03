@@ -1,6 +1,6 @@
 'use strict';
 
-var WIZARDS_PROPERTIES = {
+var WizardProperty = {
   NAMES: [
     'Иван',
     'Хуан Себастьян',
@@ -48,6 +48,10 @@ var WIZARDS_PROPERTIES = {
   ]
 };
 
+// Коды клавиш Esc и Enter:
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 var userDialogElement = document.querySelector('.setup');
 var similarListElement = userDialogElement.querySelector('.setup-similar-list');
 var setupCloseElement = userDialogElement.querySelector('.setup-close');
@@ -67,7 +71,7 @@ var generateWizards = function (properties) {
   var cloneSurnames = properties.SURNAMES.slice();
   var wizards = [];
 
-  for (var i = 0; i < properties.SURNAMES.length; i++) {
+  properties.SURNAMES.forEach(function (item, i) {
     wizards[i] = {};
 
     wizards[i].name =
@@ -84,7 +88,7 @@ var generateWizards = function (properties) {
       properties.EYES_COLORS[
         generateRandomInteger(0, properties.EYES_COLORS.length - 1)
       ];
-  }
+  });
 
   return wizards;
 };
@@ -101,18 +105,17 @@ var createWizard = function (wizard) {
 
 userDialogElement.querySelector('.setup-similar').classList.remove('hidden');
 
-var wizards = generateWizards(WIZARDS_PROPERTIES);
+var wizardsCreateFragmentAppend = (function () {
+  var wizards = generateWizards(WizardProperty);
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < 4; i++) {
-  fragment.appendChild(createWizard(wizards[i]));
-}
-similarListElement.appendChild(fragment);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < 4; i++) {
+    fragment.appendChild(createWizard(wizards[i]));
+  }
+  similarListElement.appendChild(fragment);
+})();
 
 // Открытие/закрытие окна настройки персонажа:
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
-
 // Обработчик закрытия окна при нажатии Esc
 var onDialogEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
@@ -201,7 +204,7 @@ var onWizardPropertyClick = function (
 // При клике меняем цвет мантии
 setupWizardCoatElement.addEventListener('click', function () {
   onWizardPropertyClick(
-      WIZARDS_PROPERTIES.COATS_COLORS,
+      WizardProperty.COATS_COLORS,
       setupWizardCoatElement,
       'fill',
       'coat-color'
@@ -211,7 +214,7 @@ setupWizardCoatElement.addEventListener('click', function () {
 // При клике меняем цвет глаз
 setupWizardEyesElement.addEventListener('click', function () {
   onWizardPropertyClick(
-      WIZARDS_PROPERTIES.EYES_COLORS,
+      WizardProperty.EYES_COLORS,
       setupWizardEyesElement,
       'fill',
       'eyes-color'
@@ -221,7 +224,7 @@ setupWizardEyesElement.addEventListener('click', function () {
 // При клике меняем цвет файербола
 setupFireballWrapElement.addEventListener('click', function () {
   onWizardPropertyClick(
-      WIZARDS_PROPERTIES.FIREBALL_COLORS,
+      WizardProperty.FIREBALL_COLORS,
       setupFireballWrapElement,
       'background',
       'fireball-color'
