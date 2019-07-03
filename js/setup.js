@@ -1,6 +1,6 @@
 'use strict';
 
-var WIZARDS_PROPERTIES = {
+var WizardProperty = {
   NAMES: [
     'Иван',
     'Хуан Себастьян',
@@ -32,11 +32,32 @@ var WIZARDS_PROPERTIES = {
     'rgb(0, 0, 0)'
   ],
 
-  EYES_COLORS: ['black', 'red', 'blue', 'yellow', 'green']
+  EYES_COLORS: ['black', 'red', 'blue', 'yellow', 'green'],
+
+  FIREBALL_COLORS: [
+    // 'rgb(238, 72, 48)',
+    '#ee4830',
+    // 'rgb(48, 168, 238)',
+    '#30a8ee',
+    // 'rgb(92, 230, 192)',
+    '#5ce6c0',
+    // 'rgb(232, 72, 213)',
+    '#e848d5',
+    // 'rgb(230, 232, 72)'
+    '#e6e848'
+  ]
 };
 
-var userDialog = document.querySelector('.setup');
-var similarListElement = userDialog.querySelector('.setup-similar-list');
+// Коды клавиш Esc и Enter:
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
+var userDialogElement = document.querySelector('.setup');
+var similarListElement = userDialogElement.querySelector('.setup-similar-list');
+var setupCloseElement = userDialogElement.querySelector('.setup-close');
+var setupUserNameElement = userDialogElement.querySelector('.setup-user-name');
+var setupOpenElement = document.querySelector('.setup-open');
+var setupOpenIconElement = setupOpenElement.querySelector('.setup-open-icon');
 var similarWizardTemplate = document
   .querySelector('#similar-wizard-template')
   .content.querySelector('.setup-similar-item');
@@ -50,7 +71,7 @@ var generateWizards = function (properties) {
   var cloneSurnames = properties.SURNAMES.slice();
   var wizards = [];
 
-  for (var i = 0; i < properties.SURNAMES.length; i++) {
+  properties.SURNAMES.forEach(function (item, i) {
     wizards[i] = {};
 
     wizards[i].name =
@@ -67,7 +88,7 @@ var generateWizards = function (properties) {
       properties.EYES_COLORS[
         generateRandomInteger(0, properties.EYES_COLORS.length - 1)
       ];
-  }
+  });
 
   return wizards;
 };
@@ -82,13 +103,132 @@ var createWizard = function (wizard) {
   return wizardElement;
 };
 
-userDialog.classList.remove('hidden');
-userDialog.querySelector('.setup-similar').classList.remove('hidden');
+userDialogElement.querySelector('.setup-similar').classList.remove('hidden');
 
-var wizards = generateWizards(WIZARDS_PROPERTIES);
+var wizardsCreateFragmentAppend = function () {
+  var wizards = generateWizards(WizardProperty);
 
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < 4; i++) {
-  fragment.appendChild(createWizard(wizards[i]));
-}
-similarListElement.appendChild(fragment);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < 4; i++) {
+    fragment.appendChild(createWizard(wizards[i]));
+  }
+  similarListElement.appendChild(fragment);
+};
+
+wizardsCreateFragmentAppend();
+
+// Открытие/закрытие окна настройки персонажа:
+// Обработчик закрытия окна при нажатии Esc
+var onDialogEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onCloseDialog();
+  }
+};
+
+// Обработчик открытия окна
+var onOpenDialog = function () {
+  userDialogElement.classList.remove('hidden');
+
+  // ****Удаляем обработчик открытия окна при открытом окне
+  setupOpenElement.removeEventListener('click', onOpenDialog);
+
+  // Закрытие окна при клике на Х или нажатии на нем Enter
+  setupCloseElement.addEventListener('click', onCloseDialog);
+  setupCloseElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      onCloseDialog();
+    }
+  });
+
+  // +++++ Закрытие окна при нажатии Esc
+  document.addEventListener('keydown', onDialogEscPress);
+  // Если фокус находится на форме ввода имени, то окно закрываться не должно
+  setupUserNameElement.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onDialogEscPress);
+  });
+  setupUserNameElement.addEventListener('blur', function () {
+    document.addEventListener('keydown', onDialogEscPress);
+  });
+};
+
+// Обработчик закрытия окна
+var onCloseDialog = function () {
+  userDialogElement.classList.add('hidden');
+
+  // Возвращаем обработчик открытия окна (смотри строку ****)
+  setupOpenElement.addEventListener('click', onOpenDialog);
+
+  // Удалям событие закрытия окна при нажатии Esc (смотри строку ++++)
+  document.removeEventListener('keydown', onDialogEscPress);
+};
+
+setupOpenElement.addEventListener('click', onOpenDialog);
+
+setupOpenIconElement.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    onOpenDialog();
+  }
+});
+
+var setupPlayerElement = userDialogElement.querySelector('.setup-player');
+var setupWizardCoatElement = setupPlayerElement.querySelector(
+    '.setup-wizard .wizard-coat'
+);
+var setupWizardEyesElement = setupPlayerElement.querySelector(
+    '.setup-wizard .wizard-eyes'
+);
+var setupFireballWrapElement = setupPlayerElement.querySelector(
+    '.setup-fireball-wrap'
+);
+
+// Обработчик - Меняет цвет элемента мага при нажатии на него
+var onWizardPropertyClick = function (
+    properties,
+    userPropertyElement,
+    cssProperty,
+    inputName
+) {
+  // Генерируем случайный цвет, если цвет повторяется берем другой случайный
+  do {
+    var userProperty =
+      properties[generateRandomInteger(0, properties.length - 1)];
+  } while (userProperty === userPropertyElement.style[cssProperty]);
+
+  // Меняем цвет
+  userPropertyElement.style[cssProperty] = userProperty;
+
+  // Записываем цвет в input
+  setupPlayerElement.querySelector(
+      'input[name = ' + inputName + ']'
+  ).value = userProperty;
+};
+
+// При клике меняем цвет мантии
+setupWizardCoatElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WizardProperty.COATS_COLORS,
+      setupWizardCoatElement,
+      'fill',
+      'coat-color'
+  );
+});
+
+// При клике меняем цвет глаз
+setupWizardEyesElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WizardProperty.EYES_COLORS,
+      setupWizardEyesElement,
+      'fill',
+      'eyes-color'
+  );
+});
+
+// При клике меняем цвет файербола
+setupFireballWrapElement.addEventListener('click', function () {
+  onWizardPropertyClick(
+      WizardProperty.FIREBALL_COLORS,
+      setupFireballWrapElement,
+      'background',
+      'fireball-color'
+  );
+});
