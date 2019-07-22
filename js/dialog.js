@@ -4,6 +4,10 @@
   var uploadElement = window.userDialogElement.querySelector('.upload');
 
   uploadElement.addEventListener('mousedown', function (evtDown) {
+    if (evtDown.which != 1) {
+      return;
+    }
+
     var Coordinats = function (x, y) {
       this.x = x;
       this.y = y;
