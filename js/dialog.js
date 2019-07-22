@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var uploadElement = userDialogElement.querySelector('.upload');
+  var uploadElement = window.userDialogElement.querySelector('.upload');
 
   uploadElement.addEventListener('mousedown', function (evtDown) {
     var Coordinats = function (x, y) {
@@ -23,18 +23,18 @@
         return;
       }
 
-      // isDragged = true;
+      isDragged = true;
 
       startCoordinats = new Coordinats(evtMove.clientX, evtMove.clientY);
 
-      userDialogElement.style.left =
-        userDialogElement.offsetLeft - shiftCoordinats.x + 'px';
-      userDialogElement.style.top =
-        userDialogElement.offsetTop - shiftCoordinats.y + 'px';
+      window.userDialogElement.style.left =
+        window.userDialogElement.offsetLeft - shiftCoordinats.x + 'px';
+      window.userDialogElement.style.top =
+        window.userDialogElement.offsetTop - shiftCoordinats.y + 'px';
     };
 
-    var onUploadMouseUp = function (evt) {
-      uploadElement.removeEventListener('mousemove', onUploadMousemove);
+    var onUploadMouseUp = function () {
+      document.removeEventListener('mousemove', onUploadMousemove);
       uploadElement.removeEventListener('mouseup', onUploadMouseUp);
 
       if (isDragged) {
@@ -46,7 +46,7 @@
       }
     };
 
-    uploadElement.addEventListener('mousemove', onUploadMousemove);
+    document.addEventListener('mousemove', onUploadMousemove);
     uploadElement.addEventListener('mouseup', onUploadMouseUp);
   });
 })();
