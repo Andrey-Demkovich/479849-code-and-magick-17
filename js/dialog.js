@@ -7,7 +7,7 @@
       '.setup-artifacts-shop'
   );
 
-  var onUploadMouseDown = function (evtDown) {
+  var onMouseDown = function (evtDown, setInstruction) {
     if (evtDown.which != 1) {
       return;
     }
@@ -21,7 +21,10 @@
       isDragged: false
     };
 
+    var isFirst = true;
+
     var startCoordinats = new Coordinats(evtDown.clientX, evtDown.clientY);
+    var startCoordinatFirst = startCoordinats;
 
     var onUploadMousemove = function (evtMove) {
       var shiftCoordinats = new Coordinats(
@@ -29,18 +32,19 @@
           startCoordinats.y - evtMove.clientY
       );
 
-      if (Math.abs(shiftCoordinats.x) < 2 && Math.abs(shiftCoordinats.y) < 2) {
-        return;
+      if (isFirst) {
+        isFirst = false;
+        if (
+          Math.abs(shiftCoordinats.x) < 2 &&
+          Math.abs(shiftCoordinats.y) < 2
+        ) {
+          return;
+        }
       }
-
-      window.dialog.isDragged = true;
 
       startCoordinats = new Coordinats(evtMove.clientX, evtMove.clientY);
 
-      window.userDialogElement.style.left =
-        window.userDialogElement.offsetLeft - shiftCoordinats.x + 'px';
-      window.userDialogElement.style.top =
-        window.userDialogElement.offsetTop - shiftCoordinats.y + 'px';
+      setInstruction(shiftCoordinats, startCoordinatFirst);
     };
 
     var onUploadMouseUp = function () {
@@ -60,13 +64,44 @@
     document.addEventListener('mouseup', onUploadMouseUp);
   };
 
+  var setInstruction1 = function (shiftCoordinats) {
+    window.dialog.isDragged = true;
+
+    window.userDialogElement.style.left =
+      window.userDialogElement.offsetLeft - shiftCoordinats.x + 'px';
+    window.userDialogElement.style.top =
+      window.userDialogElement.offsetTop - shiftCoordinats.y + 'px';
+  };
+
+  var onUploadMouseDown = function (evt) {
+    onMouseDown(evt, setInstruction1);
+  };
+
   uploadElement.addEventListener('mousedown', onUploadMouseDown);
 
-  // setupArtifactsShop.addEventListener('mousedown', function (evt) {
-  //   var elem = evt.target.closest('img');
-  //   if (!elem) {
-  //     return;
-  //   }
-  //   onUploadMouseDown(evt);
-  // });
+  var onUploadMouseDown2 = function (evt) {
+    var elem = evt.target.closest('img');
+    if (!elem) {
+      return;
+    }
+
+    var setInstruction2 = function (shiftCoordinats, startCoordinatFirst) {
+      elem.style.position = 'absolute';
+      elem.draggable = false;
+
+      elem.style.left = elem.offsetLeft - shiftCoordinats.x + 'px';
+      elem.style.top = elem.offsetTop - shiftCoordinats.y + 'px';
+    };
+
+    onMouseDown(evt, setInstruction2);
+
+    var instr2MouseUp = function () {
+      console.log(100);
+      document.removeEventListener('mouseup', instr2MouseUp);
+    };
+
+    document.addEventListener('mouseup', instr2MouseUp);
+  };
+
+  setupArtifactsShop.addEventListener('mousedown', onUploadMouseDown2);
 })();
