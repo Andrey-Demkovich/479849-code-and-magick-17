@@ -3,7 +3,11 @@
 (function () {
   var uploadElement = window.userDialogElement.querySelector('.upload');
 
-  uploadElement.addEventListener('mousedown', function (evtDown) {
+  var setupArtifactsShop = window.userDialogElement.querySelector(
+      '.setup-artifacts-shop'
+  );
+
+  var onUploadMouseDown = function (evtDown) {
     if (evtDown.which != 1) {
       return;
     }
@@ -13,7 +17,9 @@
       this.y = y;
     };
 
-    var isDragged = false;
+    window.dialog = {
+      isDragged: false
+    };
 
     var startCoordinats = new Coordinats(evtDown.clientX, evtDown.clientY);
 
@@ -27,7 +33,7 @@
         return;
       }
 
-      isDragged = true;
+      window.dialog.isDragged = true;
 
       startCoordinats = new Coordinats(evtMove.clientX, evtMove.clientY);
 
@@ -41,7 +47,7 @@
       document.removeEventListener('mousemove', onUploadMousemove);
       uploadElement.removeEventListener('mouseup', onUploadMouseUp);
 
-      if (isDragged) {
+      if (window.dialog.isDragged) {
         var onClickPreventDefault = function (evt) {
           evt.preventDefault();
           uploadElement.removeEventListener('click', onClickPreventDefault);
@@ -51,6 +57,16 @@
     };
 
     document.addEventListener('mousemove', onUploadMousemove);
-    uploadElement.addEventListener('mouseup', onUploadMouseUp);
-  });
+    document.addEventListener('mouseup', onUploadMouseUp);
+  };
+
+  uploadElement.addEventListener('mousedown', onUploadMouseDown);
+
+  // setupArtifactsShop.addEventListener('mousedown', function (evt) {
+  //   var elem = evt.target.closest('img');
+  //   if (!elem) {
+  //     return;
+  //   }
+  //   onUploadMouseDown(evt);
+  // });
 })();

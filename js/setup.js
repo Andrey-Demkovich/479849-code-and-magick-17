@@ -51,6 +51,8 @@ var WizardProperty = {
 // Коды клавиш Esc и Enter:
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
+var USER_DIALOG_LEFT = '50%';
+var USER_DIALOG_TOP = '80px';
 
 var userDialogElement = document.querySelector('.setup');
 var similarListElement = userDialogElement.querySelector('.setup-similar-list');
@@ -160,6 +162,12 @@ var onCloseDialog = function () {
 
   // Удалям событие закрытия окна при нажатии Esc (смотри строку ++++)
   document.removeEventListener('keydown', onDialogEscPress);
+
+  // Если окно перетаскивалось возвращаем его на штатное место
+  if (window.dialog.isDragged) {
+    window.userDialogElement.style.left = USER_DIALOG_LEFT;
+    window.userDialogElement.style.top = USER_DIALOG_TOP;
+  }
 };
 
 setupOpenElement.addEventListener('click', onOpenDialog);
