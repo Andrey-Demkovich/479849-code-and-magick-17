@@ -3,8 +3,12 @@
 (function () {
   var uploadElement = window.userDialogElement.querySelector('.upload');
 
-  var setupArtifactsShop = window.userDialogElement.querySelector(
+  var setupArtifactsShopElement = window.userDialogElement.querySelector(
       '.setup-artifacts-shop'
+  );
+
+  var playerArtifactsCellElements = window.userDialogElement.querySelectorAll(
+      '.setup-player .setup-artifacts-cell'
   );
 
   var onMouseDown = function (evtDown, setInstruction) {
@@ -24,7 +28,6 @@
     var isFirst = true;
 
     var startCoordinats = new Coordinats(evtDown.clientX, evtDown.clientY);
-    var startCoordinatFirst = startCoordinats;
 
     var onUploadMousemove = function (evtMove) {
       var shiftCoordinats = new Coordinats(
@@ -44,20 +47,20 @@
 
       startCoordinats = new Coordinats(evtMove.clientX, evtMove.clientY);
 
-      setInstruction(shiftCoordinats, startCoordinatFirst);
+      setInstruction(shiftCoordinats);
     };
 
     var onUploadMouseUp = function () {
       document.removeEventListener('mousemove', onUploadMousemove);
       uploadElement.removeEventListener('mouseup', onUploadMouseUp);
 
-      if (window.dialog.isDragged) {
-        var onClickPreventDefault = function (evt) {
-          evt.preventDefault();
-          uploadElement.removeEventListener('click', onClickPreventDefault);
-        };
-        uploadElement.addEventListener('click', onClickPreventDefault);
-      }
+      // if (window.dialog.isDragged) {
+      //   var onClickPreventDefault = function (evt) {
+      //     evt.preventDefault();
+      //     uploadElement.removeEventListener('click', onClickPreventDefault);
+      //   };
+      //   uploadElement.addEventListener('click', onClickPreventDefault);
+      // }
     };
 
     document.addEventListener('mousemove', onUploadMousemove);
@@ -85,7 +88,9 @@
       return;
     }
 
-    var setInstruction2 = function (shiftCoordinats, startCoordinatFirst) {
+    var startCellElement = evt.target.closest('.setup-artifacts-cell');
+
+    var setInstruction2 = function (shiftCoordinats) {
       elem.style.position = 'absolute';
       elem.draggable = false;
 
@@ -95,13 +100,32 @@
 
     onMouseDown(evt, setInstruction2);
 
-    var instr2MouseUp = function () {
-      console.log(100);
+    var instr2MouseUp = function (evt) {
+      var mouseseElement = document.elementFromPoint(evt.clientX, evt.clientY);
+
+      if (mouseseElement.closest('.setup-artifacts')) {
+        var cellElement = Array.from(playerArtifactsCellElements).filter(
+            function (item) {
+              return item === mouseseElement;
+            }
+        );
+
+        cellElement[0].style.position = 'relative';
+        cellElement[0].appendChild(elem);
+        elem.style.left = '0px';
+        elem.style.top = '0px';
+      } else {
+        startCellElement.style.position = 'relative';
+        startCellElement.appendChild(elem);
+        elem.style.left = '0px';
+        elem.style.top = '0px';
+      }
+
       document.removeEventListener('mouseup', instr2MouseUp);
     };
 
     document.addEventListener('mouseup', instr2MouseUp);
   };
 
-  setupArtifactsShop.addEventListener('mousedown', onUploadMouseDown2);
+  setupArtifactsShopElement.addEventListener('mousedown', onUploadMouseDown2);
 })();
